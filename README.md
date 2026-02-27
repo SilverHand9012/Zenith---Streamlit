@@ -13,6 +13,12 @@
   <img src="https://img.shields.io/badge/License-Proprietary-333333?style=flat-square" alt="License">
 </p>
 
+<p align="center">
+  <a href="https://zenith--proto.streamlit.app/">
+    <img src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" alt="Open in Streamlit">
+  </a>
+</p>
+
 ---
 
 **ZENITH** is an AI-powered diagnostic tool that acts as an autonomous performance analyst for your hardware. It uses Google's Gemini 2.0 Flash to identify bottlenecks, flag compatibility issues, and recommend safe, reversible optimization tweaks — all through a brutalist retro CLI interface.
