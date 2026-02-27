@@ -163,29 +163,6 @@ if diagnose_clicked:
     except Exception as raw_sys_err:
         render_error("UNHANDLED_SYSTEM_FAULT", f"A critical unhandled error occurred: {raw_sys_err}")
 
-    # Auto-scroll to results using scrollIntoView
-    components.html(
-        """
-        <script>
-            setTimeout(() => {
-                const doc = window.parent.document;
-                const headers = doc.querySelectorAll('h2');
-                let target = null;
-                headers.forEach(h => {
-                    if (h.textContent.includes('Diagnosis') || h.textContent.includes('ERROR')) {
-                        target = h;
-                    }
-                });
-                
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 500);
-        </script>
-        """,
-        height=0,
-        width=0,
-    )
 else:
     st.markdown(
         """
