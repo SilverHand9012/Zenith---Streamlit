@@ -15,14 +15,18 @@
 
 ---
 
-**ZENITH** is a production-grade diagnostic tool that acts as an autonomous performance analyst for your hardware. It uses Google's Gemini 2.0 Flash to identify bottlenecks, flag compatibility issues, and recommend safe, reversible optimization tweaks — all through a brutalist retro CLI interface.
+**ZENITH** is an AI-powered diagnostic tool that acts as an autonomous performance analyst for your hardware. It uses Google's Gemini 2.0 Flash to identify bottlenecks, flag compatibility issues, and recommend safe, reversible optimization tweaks — all through a brutalist retro CLI interface.
 
 <p align="center">
-  <img src="docs/screenshot_diagnosis.png" alt="Zenith Diagnosis — Software Bottleneck Identified" width="100%">
+  <img src="docs/screenshot_hero.png" alt="Zenith — Hero Section" width="100%">
 </p>
 
 <p align="center">
-  <img src="docs/screenshot_optimizations.png" alt="Zenith Optimizations — Safe, Reversible Tweaks" width="100%">
+  <img src="docs/screenshot_input.png" alt="Zenith — Diagnostic Input & Execution" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshot_results.png" alt="Zenith — Diagnosis Results & Optimizations" width="100%">
 </p>
 
 ---
