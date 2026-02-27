@@ -1,97 +1,238 @@
 """
-Zenith — Embedded SVG Components.
+Zenith — Embedded HTML/JS Components.
 
-Contains inline SVG/HTML rendered via st.markdown(unsafe_allow_html=True).
-No iframe (components.html) is used — this prevents iframe re-mount
-overhead on Streamlit reruns.
+Contains self-contained HTML documents rendered via Streamlit's
+components.html(). These are purely visual and carry no application state.
 """
 
-HARDWARE_TOPOLOGY_SVG = """
-<div style="border: 1px solid #1a1b1d; margin-top: 2rem; padding: 0.5rem;
-            background:
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 30px 30px;">
-<svg viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet"
-     style="width:100%; height:auto; display:block;"
-     xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .tl { stroke:#555; stroke-width:1; opacity:0.35; }
-    .ng { fill:rgba(255,255,255,0.08); }
-    .nc { fill:#fff; }
-    .na { fill:#888; }
-    .nm { fill:#333; stroke:#fff; stroke-width:1; }
-    .nb { fill:#555; stroke:#fff; stroke-width:1; }
-    .nn { fill:#444; stroke:#fff; stroke-width:1; }
-    .nl { fill:#8a8d91; font-size:9px; font-family:'JetBrains Mono',monospace; text-anchor:middle; }
-  </style>
+HARDWARE_TOPOLOGY_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+  body { 
+      margin: 0; 
+      overflow: hidden; 
+      background-color: transparent; 
+      color: #ffffff; 
+      font-family: 'JetBrains Mono', monospace; 
+  }
+  canvas { 
+      display: block; 
+      width: 100%; 
+      height: 100%; 
+      border: 1px solid #1a1b1d;
+      box-sizing: border-box;
+      margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+<canvas id="hardwareCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('hardwareCanvas');
+  const ctx = canvas.getContext('2d');
+  
+  function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
 
-  <!-- Connection lines -->
-  <line class="tl" x1="80"  y1="60"  x2="180" y2="45"  />
-  <line class="tl" x1="80"  y1="60"  x2="150" y2="130" />
-  <line class="tl" x1="180" y1="45"  x2="280" y2="70"  />
-  <line class="tl" x1="180" y1="45"  x2="150" y2="130" />
-  <line class="tl" x1="150" y1="130" x2="280" y2="70"  />
-  <line class="tl" x1="150" y1="130" x2="240" y2="180" />
-  <line class="tl" x1="280" y1="70"  x2="380" y2="50"  />
-  <line class="tl" x1="280" y1="70"  x2="350" y2="140" />
-  <line class="tl" x1="380" y1="50"  x2="420" y2="130" />
-  <line class="tl" x1="350" y1="140" x2="420" y2="130" />
-  <line class="tl" x1="350" y1="140" x2="240" y2="180" />
-  <line class="tl" x1="240" y1="180" x2="100" y2="200" />
-  <line class="tl" x1="100" y1="200" x2="80"  y2="60"  />
-  <line class="tl" x1="420" y1="130" x2="400" y2="210" />
-  <line class="tl" x1="240" y1="180" x2="400" y2="210" />
+  const hardwareNodes = [
+      { id: "CPU_CORE_0", type: "compute" },
+      { id: "CPU_CORE_1", type: "compute" },
+      { id: "GPU_CUDA", type: "accel" },
+      { id: "SYS_MEM", type: "mem" },
+      { id: "VRAM_BANK", type: "mem" },
+      { id: "NVME_0", type: "storage" },
+      { id: "NPU_ACCEL", type: "accel" },
+      { id: "L3_CACHE", type: "mem" },
+      { id: "BUS_CTRL", type: "bus" },
+      { id: "NET_NIC", type: "net" }
+  ];
 
-  <!-- CPU_CORE_0 -->
-  <circle class="ng" cx="80"  cy="60"  r="8" />
-  <circle class="nc" cx="80"  cy="60"  r="4" />
-  <text class="nl" x="80"  y="45">CPU_CORE_0</text>
+  const nodes = hardwareNodes.map(n => ({
+      name: n.id,
+      type: n.type,
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 1.0,
+      vy: (Math.random() - 0.5) * 1.0,
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.05 + Math.random() * 0.05
+  }));
 
-  <!-- CPU_CORE_1 -->
-  <circle class="ng" cx="180" cy="45"  r="8" />
-  <circle class="nc" cx="180" cy="45"  r="4" />
-  <text class="nl" x="180" y="30">CPU_CORE_1</text>
+  let mouse = { x: -1000, y: -1000, active: false };
+  window.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+      mouse.active = true;
+  });
+  window.addEventListener('mouseleave', () => {
+      mouse.active = false;
+  });
 
-  <!-- GPU_CUDA -->
-  <circle class="ng" cx="280" cy="70"  r="8" />
-  <circle class="na" cx="280" cy="70"  r="4" />
-  <text class="nl" x="280" y="55">GPU_CUDA</text>
+  // Draw background grid with slight parallax
+  function drawGrid() {
+      const gridSize = 30;
+      const offsetX = mouse.active ? (mouse.x - canvas.width/2) * -0.02 : 0;
+      const offsetY = mouse.active ? (mouse.y - canvas.height/2) * -0.02 : 0;
+      
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      
+      for(let x = (offsetX % gridSize); x < canvas.width; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+      }
+      for(let y = (offsetY % gridSize); y < canvas.height; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+      }
+  }
 
-  <!-- SYS_MEM -->
-  <circle class="ng" cx="150" cy="130" r="8" />
-  <circle class="nm" cx="150" cy="130" r="4" />
-  <text class="nl" x="150" y="115">SYS_MEM</text>
+  function draw() {
+      // Clear with trailing effect
+      ctx.fillStyle = 'rgba(15, 16, 17, 0.3)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  <!-- NPU_ACCEL -->
-  <circle class="ng" cx="380" cy="50"  r="8" />
-  <circle class="na" cx="380" cy="50"  r="4" />
-  <text class="nl" x="380" y="35">NPU_ACCEL</text>
+      drawGrid();
 
-  <!-- L3_CACHE -->
-  <circle class="ng" cx="420" cy="130" r="8" />
-  <circle class="nm" cx="420" cy="130" r="4" />
-  <text class="nl" x="420" y="115">L3_CACHE</text>
+      // Update nodes
+      nodes.forEach(node => {
+          node.x += node.vx;
+          node.y += node.vy;
+          node.pulse += node.pulseSpeed;
 
-  <!-- BUS_CTRL -->
-  <circle class="ng" cx="350" cy="140" r="8" />
-  <circle class="nb" cx="350" cy="140" r="4" />
-  <text class="nl" x="350" y="125">BUS_CTRL</text>
+          // Bounce off walls softly
+          if (node.x <= 30) { node.x = 30; node.vx *= -1; }
+          if (node.x >= canvas.width - 30) { node.x = canvas.width - 30; node.vx *= -1; }
+          if (node.y <= 30) { node.y = 30; node.vy *= -1; }
+          if (node.y >= canvas.height - 30) { node.y = canvas.height - 30; node.vy *= -1; }
 
-  <!-- NVME_0 -->
-  <circle class="ng" cx="240" cy="180" r="8" />
-  <circle class="nm" cx="240" cy="180" r="4" />
-  <text class="nl" x="240" y="165">NVME_0</text>
+          // Mouse interaction (repel + speed up)
+          if (mouse.active) {
+              const dx = mouse.x - node.x;
+              const dy = mouse.y - node.y;
+              const dist = Math.sqrt(dx*dx + dy*dy);
+              
+              if (dist < 150) {
+                  const force = (150 - dist) / 150;
+                  node.vx -= (dx / dist) * force * 0.5;
+                  node.vy -= (dy / dist) * force * 0.5;
+                  
+                  // Draw interaction line
+                  ctx.beginPath();
+                  ctx.moveTo(node.x, node.y);
+                  ctx.lineTo(mouse.x, mouse.y);
+                  ctx.strokeStyle = `rgba(255, 255, 255, ${force * 0.5})`;
+                  ctx.lineWidth = 1;
+                  ctx.stroke();
+              }
+          }
+          
+          // Friction max speed limit
+          const speed = Math.sqrt(node.vx*node.vx + node.vy*node.vy);
+          if (speed > 2.5) {
+              node.vx = (node.vx / speed) * 2.5;
+              node.vy = (node.vy / speed) * 2.5;
+          }
+      });
 
-  <!-- VRAM_BANK -->
-  <circle class="ng" cx="100" cy="200" r="8" />
-  <circle class="nm" cx="100" cy="200" r="4" />
-  <text class="nl" x="100" y="215">VRAM_BANK</text>
+      // Draw connections
+      for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+              const dx = nodes[i].x - nodes[j].x;
+              const dy = nodes[i].y - nodes[j].y;
+              const distSq = dx*dx + dy*dy;
+              
+              const connectDist = 30000;
+              if (distSq < connectDist) {
+                  const opacity = 1 - (distSq / connectDist);
+                  ctx.beginPath();
+                  ctx.moveTo(nodes[i].x, nodes[i].y);
+                  ctx.lineTo(nodes[j].x, nodes[j].y);
+                  ctx.strokeStyle = `rgba(136, 136, 136, ${opacity * 0.6})`;
+                  ctx.lineWidth = 1.5;
+                  ctx.stroke();
+                  
+                  // Data packet animation (flowing dots along lines)
+                  if (Math.random() > 0.98) {
+                      const packetX = nodes[i].x - dx * 0.5;
+                      const packetY = nodes[i].y - dy * 0.5;
+                      ctx.fillStyle = '#ffffff';
+                      ctx.fillRect(packetX - 1, packetY - 1, 3, 3);
+                  }
+              }
+          }
+      }
 
-  <!-- NET_NIC -->
-  <circle class="ng" cx="400" cy="210" r="8" />
-  <circle class="nn" cx="400" cy="210" r="4" />
-  <text class="nl" x="400" y="225">NET_NIC</text>
-</svg>
-</div>
+      // Draw nodes
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      nodes.forEach(node => {
+          // Node glowing pulse size
+          const currentRadius = 4 + Math.sin(node.pulse) * 1.5;
+          
+          // Outer glow
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, currentRadius + 3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+          ctx.fill();
+
+          // Main dot
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, currentRadius, 0, Math.PI * 2);
+          
+          // Color code by type
+          if (node.type === 'compute') ctx.fillStyle = '#ffffff'; // White for CPU
+          else if (node.type === 'accel') ctx.fillStyle = '#888888'; // Gray for GPU/NPU
+          else ctx.fillStyle = '#111111'; // Dark for mem/storage
+          
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Label text
+          ctx.fillStyle = '#8a8d91';
+          ctx.fillText(node.name, node.x, node.y - 15);
+      });
+
+      // Target reticle on mouse
+      if (mouse.active) {
+          ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, 8, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(mouse.x - 12, mouse.y);
+          ctx.lineTo(mouse.x - 4, mouse.y);
+          ctx.moveTo(mouse.x + 12, mouse.y);
+          ctx.lineTo(mouse.x + 4, mouse.y);
+          ctx.moveTo(mouse.x, mouse.y - 12);
+          ctx.lineTo(mouse.x, mouse.y - 4);
+          ctx.moveTo(mouse.x, mouse.y + 12);
+          ctx.lineTo(mouse.x, mouse.y + 4);
+          ctx.stroke();
+      }
+
+      requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+</body>
+</html>
 """

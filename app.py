@@ -7,13 +7,14 @@ No business logic or data access lives here.
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 
 from domain.models import TelemetryInput
 from domain.exceptions import ZenithException
 from service.diagnostics_service import DiagnosticsService
 from ui.renderers import render_full_results, render_error
-from ui.components import HARDWARE_TOPOLOGY_SVG
+from ui.components import HARDWARE_TOPOLOGY_HTML
 from ui_constants import BRUTALIST_CSS
 
 # ──────────────────────────────────────────────────────────────
@@ -64,7 +65,7 @@ with head_col1:
     )
 
 with head_col2:
-    st.markdown(HARDWARE_TOPOLOGY_SVG, unsafe_allow_html=True)
+    components.html(HARDWARE_TOPOLOGY_HTML, height=280)
 
 # ──────────────────────────────────────────────────────────────
 # 4. INPUT PORTAL (MAIN PAGE GRID)
@@ -91,30 +92,29 @@ with col_left:
     )
 
 with col_right:
-    with st.form("diagnostics_form"):
-        st.markdown("### >>> SYSTEM_SPECS_CONFIG")
+    st.markdown("### >>> SYSTEM_SPECS_CONFIG")
 
-        row1_col1, row1_col2 = st.columns(2)
-        with row1_col1:
-            cpu = st.text_input("CPU TIER", placeholder="e.g. AMD Ryzen 5", key="input_cpu")
-        with row1_col2:
-            gpu = st.text_input("GPU COMPUTE", placeholder="e.g. NVIDIA RTX 3050", key="input_gpu")
+    row1_col1, row1_col2 = st.columns(2)
+    with row1_col1:
+        cpu = st.text_input("CPU TIER", placeholder="e.g. AMD Ryzen 5", key="input_cpu")
+    with row1_col2:
+        gpu = st.text_input("GPU COMPUTE", placeholder="e.g. NVIDIA RTX 3050", key="input_gpu")
 
-        row2_col1, row2_col2, row2_col3 = st.columns(3)
-        with row2_col1:
-            ram = st.text_input("RAM ALLOCATION", placeholder="e.g. 16GB", key="input_ram")
-        with row2_col2:
-            os_name = st.selectbox("OPERATING_SYSTEM", options=["Windows 10", "Windows 11", "Linux", "macOS"], index=None, placeholder="Select OS...", key="input_os")
-        with row2_col3:
-            storage = st.selectbox("STORAGE_CLASS", options=["NVMe SSD", "SATA SSD", "HDD"], index=None, placeholder="Select Storage...", key="input_storage")
-            
-        st.markdown("### >>> TARGET_OPERATION")
+    row2_col1, row2_col2, row2_col3 = st.columns(3)
+    with row2_col1:
+        ram = st.text_input("RAM ALLOCATION", placeholder="e.g. 16GB", key="input_ram")
+    with row2_col2:
+        os_name = st.selectbox("OPERATING_SYSTEM", options=["Windows 10", "Windows 11", "Linux", "macOS"], index=None, placeholder="Select OS...", key="input_os")
+    with row2_col3:
+        storage = st.selectbox("STORAGE_CLASS", options=["NVMe SSD", "SATA SSD", "HDD"], index=None, placeholder="Select Storage...", key="input_storage")
+        
+    st.markdown("### >>> TARGET_OPERATION")
 
-        application = st.text_input("APPLICATION DEPLOYMENT", placeholder="e.g. Elden Ring, VS Code", key="input_app")
-        symptoms = st.text_area("ANOMALY_SYMPTOMS", placeholder="Describe the performance issue in detail...", height=120, key="input_symptoms")
+    application = st.text_input("APPLICATION DEPLOYMENT", placeholder="e.g. Elden Ring, VS Code", key="input_app")
+    symptoms = st.text_area("ANOMALY_SYMPTOMS", placeholder="Describe the performance issue in detail...", height=120, key="input_symptoms")
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        diagnose_clicked = st.form_submit_button(">>> INITIALIZE_DIAGNOSTIC_SEQUENCE", use_container_width=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    diagnose_clicked = st.button(">>> INITIALIZE_DIAGNOSTIC_SEQUENCE", use_container_width=True)
 
 
 # ──────────────────────────────────────────────────────────────
