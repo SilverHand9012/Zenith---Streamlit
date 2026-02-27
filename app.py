@@ -7,14 +7,13 @@ No business logic or data access lives here.
 """
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 
 from domain.models import TelemetryInput
 from domain.exceptions import ZenithException
 from service.diagnostics_service import DiagnosticsService
 from ui.renderers import render_full_results, render_error
-from ui.components import HARDWARE_TOPOLOGY_HTML
+from ui.components import HARDWARE_TOPOLOGY_SVG
 from ui_constants import BRUTALIST_CSS
 
 # ──────────────────────────────────────────────────────────────
@@ -65,7 +64,7 @@ with head_col1:
     )
 
 with head_col2:
-    components.html(HARDWARE_TOPOLOGY_HTML, height=280)
+    st.markdown(HARDWARE_TOPOLOGY_SVG, unsafe_allow_html=True)
 
 # ──────────────────────────────────────────────────────────────
 # 4. INPUT PORTAL (MAIN PAGE GRID)
