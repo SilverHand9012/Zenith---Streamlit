@@ -92,7 +92,6 @@ with col_left:
     )
 
 with col_right:
-    st.markdown("<div style='padding: 2rem 0;'>", unsafe_allow_html=True)
     st.markdown("### >>> SYSTEM_SPECS_CONFIG")
 
     row1_col1, row1_col2 = st.columns(2)
@@ -116,7 +115,6 @@ with col_right:
 
     st.markdown("<br>", unsafe_allow_html=True)
     diagnose_clicked = st.button(">>> INITIALIZE_DIAGNOSTIC_SEQUENCE", use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ──────────────────────────────────────────────────────────────
