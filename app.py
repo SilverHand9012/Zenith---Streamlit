@@ -65,9 +65,7 @@ with head_col1:
     )
 
 with head_col2:
-    st.markdown("<div style='padding-top:2rem; width:100%; height:100%; border:1px solid var(--border-main);'>", unsafe_allow_html=True)
     components.html(HARDWARE_TOPOLOGY_HTML, height=280)
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ──────────────────────────────────────────────────────────────
 # 4. INPUT PORTAL (MAIN PAGE GRID)
