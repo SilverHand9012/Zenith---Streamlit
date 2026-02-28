@@ -5,6 +5,8 @@ Contains self-contained HTML documents rendered via Streamlit's
 components.html(). These are purely visual and carry no application state.
 """
 
+__all__ = ["HARDWARE_TOPOLOGY_HTML"]
+
 HARDWARE_TOPOLOGY_HTML = """
 <!DOCTYPE html>
 <html>
@@ -233,6 +235,7 @@ HARDWARE_TOPOLOGY_HTML = """
   }
   draw();
 </script>
+</body>
 </body>
 </html>
 """

@@ -15,6 +15,7 @@ from domain.exceptions import ZenithException
 from service.diagnostics_service import DiagnosticsService
 from ui.renderers import render_full_results, render_error
 from ui.components import HARDWARE_TOPOLOGY_HTML
+from ui.js_components import AUTO_SCROLL_JS, HOW_TO_USE_DIALOG_HTML
 from ui_constants import BRUTALIST_CSS
 
 # ──────────────────────────────────────────────────────────────
@@ -51,16 +52,24 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+components.html(HOW_TO_USE_DIALOG_HTML, height=0)
+
 head_col1, head_col2 = st.columns([1.5, 1], gap="large")
 
 with head_col1:
     st.markdown(
-        """
-        <div class="header-banner">
+        '''
+        <div class="header-banner" style="position: relative; padding-right: 4rem;">
+            <!-- Subtle Tech Texture bridging the gap -->
+            <div style="position: absolute; right: 0; top: 1rem; bottom: 1rem; width: 40px; border-left: 1px dotted rgba(255,255,255,0.15); opacity: 0.7; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted); user-select: none;">
+                <span style="color: var(--status-cyan);">[TX]</span>
+                <span style="writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 4px; opacity: 0.4;">DATA_STREAM</span>
+                <span>[RX]</span>
+            </div>
             <h1 class="brutalist-title">Hardware Insights &gt;&gt;&gt;<br>&gt;&gt;&gt; Peak Performance</h1>
             <div class="header-subtitle"><br>ZENITH Is A Diagnostic Tool Built To Power The Foundations Of Digital Infrastructure.<br><strong style="color:var(--text-main);">CPU, GPU, RAM, Storage, And Software</strong> All Run On Fast, Scalable Analysis Designed For Real-World Impact.</div>
         </div>
-        """,
+        ''',
         unsafe_allow_html=True,
     )
 
@@ -88,34 +97,62 @@ with col_left:
             </p>
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
+    components.html(HOW_TO_USE_DIALOG_HTML, height=60)
+
 with col_right:
-    with st.form("diagnostics_form"):
-        st.markdown("### >>> SYSTEM_SPECS_CONFIG")
+    st.markdown("<div style='padding: 2rem 0;'>", unsafe_allow_html=True)
+    st.markdown("### >>> SYSTEM_SPECS_CONFIG")
 
-        row1_col1, row1_col2 = st.columns(2)
-        with row1_col1:
-            cpu = st.text_input("CPU TIER", placeholder="e.g. AMD Ryzen 5", key="input_cpu")
-        with row1_col2:
-            gpu = st.text_input("GPU COMPUTE", placeholder="e.g. NVIDIA RTX 3050", key="input_gpu")
+    row1_col1, row1_col2 = st.columns(2)
+    with row1_col1:
+        cpu = st.text_input("CPU TIER", placeholder="e.g. AMD Ryzen 5", key="input_cpu")
+    with row1_col2:
+        gpu = st.text_input(
+            "GPU COMPUTE", placeholder="e.g. NVIDIA RTX 3050", key="input_gpu"
+        )
 
-        row2_col1, row2_col2, row2_col3 = st.columns(3)
-        with row2_col1:
-            ram = st.text_input("RAM ALLOCATION", placeholder="e.g. 16GB", key="input_ram")
-        with row2_col2:
-            os_name = st.selectbox("OPERATING_SYSTEM", options=["Windows 10", "Windows 11", "Linux", "macOS"], index=None, placeholder="Select OS...", key="input_os")
-        with row2_col3:
-            storage = st.selectbox("STORAGE_CLASS", options=["NVMe SSD", "SATA SSD", "HDD"], index=None, placeholder="Select Storage...", key="input_storage")
-            
-        st.markdown("### >>> TARGET_OPERATION")
+    row2_col1, row2_col2, row2_col3 = st.columns(3)
+    with row2_col1:
+        ram = st.text_input("RAM ALLOCATION", placeholder="e.g. 16GB", key="input_ram")
+    with row2_col2:
+        os_name = st.selectbox(
+            "OPERATING_SYSTEM",
+            options=["Windows 10", "Windows 11", "Linux", "macOS"],
+            index=None,
+            placeholder="Select OS...",
+            key="input_os",
+        )
+    with row2_col3:
+        storage = st.selectbox(
+            "STORAGE_CLASS",
+            options=["NVMe SSD", "SATA SSD", "HDD"],
+            index=None,
+            placeholder="Select Storage...",
+            key="input_storage",
+        )
 
-        application = st.text_input("APPLICATION DEPLOYMENT", placeholder="e.g. Elden Ring, VS Code", key="input_app")
-        symptoms = st.text_area("ANOMALY_SYMPTOMS", placeholder="Describe the performance issue in detail...", height=120, key="input_symptoms")
+    st.markdown("### >>> TARGET_OPERATION")
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        diagnose_clicked = st.form_submit_button(">>> INITIALIZE_DIAGNOSTIC_SEQUENCE", use_container_width=True)
+    application = st.text_input(
+        "APPLICATION DEPLOYMENT",
+        placeholder="e.g. Elden Ring, VS Code",
+        key="input_app",
+    )
+    symptoms = st.text_area(
+        "ANOMALY_SYMPTOMS",
+        placeholder="Describe the performance issue in detail...",
+        height=120,
+        key="input_symptoms",
+    )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    diagnose_clicked = st.button(
+        ">>> INITIALIZE_DIAGNOSTIC_SEQUENCE", use_container_width=True
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ──────────────────────────────────────────────────────────────
@@ -131,7 +168,9 @@ if diagnose_clicked:
         storage=storage,
         os_name=os_name,
         application=application,
-        symptoms=(symptoms or "").strip() if (symptoms or "").strip() else "Not specified"
+        symptoms=(symptoms or "").strip()
+        if (symptoms or "").strip()
+        else "Not specified",
     )
 
     try:
@@ -150,25 +189,29 @@ if diagnose_clicked:
                 unsafe_allow_html=True,
             )
             # 4. Invoke Core Domain Use Case
-            result = service.run_diagnostics(telemetry)
+        result = service.run_diagnostics(telemetry)
 
         # 5. Render Response
         render_full_results(result)
+        components.html(AUTO_SCROLL_JS, height=0)
 
     except ZenithException as internal_err:
         render_error(type(internal_err).__name__, str(internal_err))
     except Exception as raw_sys_err:
-        render_error("UNHANDLED_SYSTEM_FAULT", f"A critical unhandled error occurred: {raw_sys_err}")
+        render_error(
+            "UNHANDLED_SYSTEM_FAULT",
+            f"A critical unhandled error occurred: {raw_sys_err}",
+        )
 
 else:
     st.markdown(
         """
-        <div style="padding:4rem 0; color:var(--text-muted); font-family:var(--font-mono); font-size:0.9rem;">
+        <div style="padding: 4rem 2rem; color:var(--text-muted); font-family:var(--font-mono); font-size:0.85rem; letter-spacing:1px; line-height: 2;">
             >>> AWAITING_INPUT<br><br>
             [ PLEASE CONFIGURE SYSTEM TELEMETRY ABOVE ]
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 # ──────────────────────────────────────────────────────────────

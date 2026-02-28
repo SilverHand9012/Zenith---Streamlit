@@ -24,7 +24,9 @@ class GeminiDiagnosticsRepository:
 
     def __init__(self, api_key: str) -> None:
         if not api_key:
-            raise ExternalServiceError("Gemini API key is required but was not provided.")
+            raise ExternalServiceError(
+                "Gemini API key is required but was not provided."
+            )
         self.client = genai.Client(api_key=api_key)
         logger.info("GeminiDiagnosticsRepository initialised successfully.")
 
@@ -68,4 +70,6 @@ class GeminiDiagnosticsRepository:
             return parsed
         except json.JSONDecodeError as exc:
             logger.error("Failed to parse Gemini response as JSON: %s", exc)
-            raise DataParsingError(f"Failed to parse Gemini response as JSON: {exc}") from exc
+            raise DataParsingError(
+                f"Failed to parse Gemini response as JSON: {exc}"
+            ) from exc

@@ -53,24 +53,24 @@ def render_diagnosis_header(diagnosis: Diagnosis) -> None:
         secondary = _sanitize(diagnosis.secondary_bottleneck)
         secondary_html = (
             f'<span class="badge badge-caution" style="margin-left:0.5rem;">'
-            f'Secondary: {secondary}</span>'
+            f"Secondary: {secondary}</span>"
         )
 
     html_content = (
         '<div class="result-card fade-in">'
         '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">'
-        '<div>'
+        "<div>"
         f'<span class="badge badge-bottleneck">{bottleneck} BOTTLENECK</span>'
-        f'{secondary_html}'
-        '</div>'
+        f"{secondary_html}"
+        "</div>"
         '<div style="color:var(--text-dim); font-size:0.75rem;">'
         f'SEVERITY: <span style="color:{color}; font-weight:700;">{diagnosis.severity}/10</span>'
-        '</div>'
-        '</div>'
+        "</div>"
+        "</div>"
         '<div class="severity-bar-track" style="margin-top:0.8rem;">'
         f'<div class="severity-bar-fill" style="width:{diagnosis.severity * 10}%; background:linear-gradient(90deg, var(--status-green), {color});"></div>'
-        '</div>'
-        '</div>'
+        "</div>"
+        "</div>"
     )
     st.markdown(html_content, unsafe_allow_html=True)
 
@@ -86,15 +86,15 @@ def render_plain_english(diagnosis: Diagnosis) -> None:
             '<details style="margin-top:0.8rem; cursor:pointer;">'
             '<summary style="color:var(--text-dim); font-size:0.75rem; letter-spacing:1px;">▸ TECHNICAL REASONING</summary>'
             f'<p style="color:var(--text-dim); font-size:0.8rem; margin-top:0.5rem; line-height:1.6;">{reasoning}</p>'
-            '</details>'
+            "</details>"
         )
 
     html_content = (
         '<div class="result-card fade-in">'
         '<div class="terminal-prompt">diagnosis.summary</div>'
         f'<p style="margin:0.5rem 0 0 0; font-size:0.9rem !important; line-height:1.8 !important;">{plain}</p>'
-        f'{reasoning_html}'
-        '</div>'
+        f"{reasoning_html}"
+        "</div>"
     )
     st.markdown(html_content, unsafe_allow_html=True)
 
@@ -114,12 +114,12 @@ def render_compatibility(compat: Compatibility) -> None:
         '<div class="result-card fade-in">'
         '<div style="display:flex; align-items:center; gap:1rem;">'
         f'<div style="font-size:2rem; font-weight:700; color:{color};">{compat.score}<span style="font-size:0.9rem; color:var(--text-dim);">%</span></div>'
-        '<div>'
+        "<div>"
         '<div class="terminal-prompt">compatibility.score</div>'
         f'<p style="margin:0.2rem 0 0 0; font-size:0.8rem;">{note}</p>'
-        '</div>'
-        '</div>'
-        '</div>'
+        "</div>"
+        "</div>"
+        "</div>"
     )
     st.markdown(html_content, unsafe_allow_html=True)
 
@@ -158,15 +158,15 @@ def render_tweak_card(idx: int, tweak: Tweak) -> None:
         '<div style="display:flex; align-items:center; gap:0.6rem;">'
         f'<span style="color:var(--status-cyan); font-weight:700; font-size:1.2rem;">{idx + 1:02d}</span>'
         f'<span style="font-weight:600; font-size:0.9rem; color:var(--text-main);">{title}</span>'
-        '</div>'
+        "</div>"
         '<div style="display:flex; gap:0.4rem;">'
         f'<span class="badge badge-type">{tweak_type}</span>'
         f'<span class="badge {badge_cls}">{safety}</span>'
-        '</div>'
-        '</div>'
+        "</div>"
+        "</div>"
         f'<ol style="margin:0; padding-left:1.2rem; color:var(--text-main);">{steps_html}</ol>'
         f'{commands_html}<p style="margin:0.6rem 0 0 0; font-size:0.78rem; color:var(--text-dim); font-style:italic;">⟐ {rationale}</p>'
-        f'{revert_html}</div>'
+        f"{revert_html}</div>"
     )
     st.markdown(html_content, unsafe_allow_html=True)
 
@@ -181,7 +181,7 @@ def render_do_not_do(items: List[DoNotDo]) -> None:
             '<div class="warning-card fade-in">'
             f'<div style="font-weight:600; color:var(--status-red); font-size:0.85rem; margin-bottom:0.3rem;">✕ {action}</div>'
             f'<p style="margin:0; font-size:0.8rem; color:var(--text-dim);">{reason}</p>'
-            '</div>'
+            "</div>"
         )
         st.markdown(html_content, unsafe_allow_html=True)
 
@@ -199,9 +199,9 @@ def render_error(error_code: str, error_message: str) -> None:
         '<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">'
         '<span style="color:var(--status-red); font-weight:700; font-size:0.85rem;">⚠️ ERROR</span>'
         f'<span class="badge badge-risky">{code}</span>'
-        '</div>'
+        "</div>"
         f'<p style="margin:0; font-size:0.82rem; color:var(--text-main);">{message}</p>'
-        '</div>'
+        "</div>"
     )
     st.markdown(html_content, unsafe_allow_html=True)
 
